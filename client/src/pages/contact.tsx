@@ -107,7 +107,7 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="text-lg font-bold mb-1">Call Us</h3>
-                  <p className="text-muted-foreground">0451 658 537</p>
+                  <p className="text-muted-foreground"> 0474 817 548</p>
                 </div>
               </div>
               
