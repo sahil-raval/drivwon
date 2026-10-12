@@ -26,7 +26,7 @@ The Studio is hosted separately from the public Vite app. Public pages query pub
 
 SEO fields include title and description, canonical URL, index/no-index, social title/description/image, focus keywords and custom JSON-LD. The server injects page metadata into the initial HTML for search and social crawlers, reads site-wide defaults and Search Console verification from Site settings, emits organization/article JSON-LD, and serves `robots.txt` and a Sanity-aware `sitemap.xml`. Set `APP_URL` to the exact production origin. Review custom canonical URLs, structured data, image alt text and Search Console verification before publishing.
 
-The Sanity API token pasted into the original request is intentionally **not** stored or used. Revoke/rotate it in Sanity. Public published-content reads and Sanity's account login for Studio do not require putting a write token in this app.
+Public published-content reads and Sanity's account login for Studio do not require a write token in this app. Never commit Sanity write tokens; revoke and replace any token that has been exposed.
 
 ## Private workspace setup
 
