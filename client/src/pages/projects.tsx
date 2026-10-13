@@ -3,12 +3,12 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useAudio } from "@/lib/audio";
 import { ExternalLink, Github } from "lucide-react";
-import psm from "@/assets/projects/psmfinance.png";
-import aprational from "@/assets/projects/aprational.png";
-import msm from "@/assets/projects/msm.png";
-import scrub from "@/assets/projects/Scrub.png";
-import varni from "@/assets/projects/Varni.png";
-import daytoday from "@/assets/projects/Daytoday.png";
+import psm from "@/assets/projects/psmfinance.webp";
+import aprational from "@/assets/projects/aprational.webp";
+import msm from "@/assets/projects/msm.webp";
+import scrub from "@/assets/projects/Scrub.webp";
+import varni from "@/assets/projects/Varni.webp";
+import daytoday from "@/assets/projects/Daytoday.webp";
 
 const projects = [
   {
@@ -101,6 +101,8 @@ export default function Projects() {
                   <img
                     src={project.image}
                     alt={project.title}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                   />
                 </div>

@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import HeroScene from "@/components/3d/Scene";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Code, Palette, Smartphone, Globe, Rocket, BarChart } from "lucide-react";
 import { Link } from "wouter";
@@ -50,7 +49,10 @@ export default function Home() {
       
       {/* Hero Section */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
-        <HeroScene />
+        <div aria-hidden="true" className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,.18),transparent_65%)]">
+          <div className="absolute inset-x-0 top-1/4 mx-auto h-56 w-56 rounded-full bg-primary/15 blur-[100px]" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-background" />
+        </div>
         <div className="container relative z-10 px-6 pt-20">
           <motion.div
             initial={{ opacity: 0, y: 30 }}

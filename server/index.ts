@@ -2,9 +2,11 @@ import express, { type Request, Response, NextFunction } from "express";
 import { createServer } from "http";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
+import { attachWorkspaceSessions } from "./features/auth";
 
 const app = express();
 const httpServer = createServer(app);
+attachWorkspaceSessions(app);
 
 /* ─────────────────────────────────────────────── */
 /* Extend IncomingMessage to store rawBody         */
@@ -20,13 +22,26 @@ declare module "http" {
 /* ─────────────────────────────────────────────── */
 app.use(
   express.json({
+    limit: "1mb",
     verify: (req, _res, buf) => {
       req.rawBody = buf;
     },
   }),
 );
 
+app.use("/api/workspace/files", express.raw({ type: "*/*", limit: "50mb" }));
 app.use(express.urlencoded({ extended: false }));
+
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  res.setHeader("X-Frame-Options", "DENY");
+  res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  if (process.env.NODE_ENV === "production") {
+    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+  }
+  next();
+});
 
 /* ─────────────────────────────────────────────── */
 /* Logger Utility                                  */
@@ -48,22 +63,11 @@ export function log(message: string, source = "express") {
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
-  let capturedJsonResponse: unknown;
-
-  const originalJson = res.json.bind(res);
-  res.json = (body: any) => {
-    capturedJsonResponse = body;
-    return originalJson(body);
-  };
 
   res.on("finish", () => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-      log(logLine);
+      log(`${req.method} ${path} ${res.statusCode} in ${duration}ms`);
     }
   });
 
@@ -79,8 +83,9 @@ app.use((req, res, next) => {
   /* Global Error Handler */
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
     const status = err.status || err.statusCode || 500;
-    const message = err.message || "Internal Server Error";
-    res.status(status).json({ message });
+    if (status >= 500) console.error("[server] Request failed.", err);
+    const message = status >= 500 ? "Something went wrong. Please try again." : (err.message || "Request failed.");
+    res.status(status).json({ error: message });
   });
 
   /* Production / Development setup */
