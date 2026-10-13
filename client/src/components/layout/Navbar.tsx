@@ -4,7 +4,7 @@ import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useAudio } from "@/lib/audio";
-import { defaultNavigation, useSiteSettings } from "@/features/cms/useSiteSettings";
+import { defaultNavigation, isPrivateWorkspacePath, useSiteSettings } from "@/features/cms/useSiteSettings";
 import { imageUrl } from "@/features/cms/client";
 import logoFallback from "@/assets/logo.png";
 
@@ -14,7 +14,7 @@ export default function Navbar() {
   const [location] = useLocation();
   const { playHover, playClick } = useAudio();
   const settings = useSiteSettings();
-  const links = settings?.navigation?.length ? settings.navigation : defaultNavigation;
+  const links = (settings?.navigation?.length ? settings.navigation : defaultNavigation).filter((link) => !isPrivateWorkspacePath(link.href));
   const logo = imageUrl(settings?.logo, 360) || logoFallback;
 
   useEffect(() => {

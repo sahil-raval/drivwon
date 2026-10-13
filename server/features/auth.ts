@@ -1,4 +1,4 @@
-import { createCipheriv, createDecipheriv, randomBytes, scryptSync, timingSafeEqual } from "crypto";
+import { createCipheriv, createDecipheriv, createHmac, randomBytes, scryptSync, timingSafeEqual } from "crypto";
 import type { Express, NextFunction, Request, Response } from "express";
 import session from "express-session";
 import connectPgSimple from "connect-pg-simple";
@@ -14,6 +14,8 @@ type WorkspaceIdentity = {
 declare module "express-session" {
   interface SessionData {
     oauthState?: string;
+    adminAuthenticated?: boolean;
+    adminPasswordVersion?: string;
     workspaceUser?: WorkspaceIdentity;
     googleTokensEncrypted?: string;
   }
@@ -23,10 +25,17 @@ export const workspaceConfig = {
   get databaseReady() {
     return Boolean(pool);
   },
+  get adminReady() {
+    return Boolean(pool && process.env.SESSION_SECRET && (process.env.DRIVWON_ADMIN_PASSWORD?.length ?? 0) >= 16);
+  },
   get oauthReady() {
     return Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET && process.env.SESSION_SECRET && (process.env.GOOGLE_ALLOWED_EMAILS || process.env.GOOGLE_ALLOWED_DOMAINS));
   },
 };
+
+const loginFailures = new Map<string, { count: number; startedAt: number }>();
+const loginWindowMs = 15 * 60 * 1000;
+const maxLoginAttempts = 5;
 
 export function attachWorkspaceSessions(app: Express) {
   const secret = process.env.SESSION_SECRET;
@@ -66,13 +75,61 @@ function createOAuthClient(req: Request) {
 }
 
 function configurationReady() {
-  return workspaceConfig.databaseReady && workspaceConfig.oauthReady;
+  return workspaceConfig.adminReady;
 }
 
 function safeCompare(a: string, b: string) {
   const left = Buffer.from(a);
   const right = Buffer.from(b);
   return left.length === right.length && timingSafeEqual(left, right);
+}
+
+function currentAdminPasswordVersion() {
+  const sessionSecret = process.env.SESSION_SECRET;
+  const password = process.env.DRIVWON_ADMIN_PASSWORD;
+  if (!sessionSecret || !password) return "";
+  return createHmac("sha256", sessionSecret).update(password).digest("hex");
+}
+
+function isAdminAuthenticated(req: Request) {
+  const expectedVersion = currentAdminPasswordVersion();
+  const storedVersion = req.session?.adminPasswordVersion ?? "";
+  return Boolean(expectedVersion && req.session?.adminAuthenticated && safeCompare(storedVersion, expectedVersion));
+}
+
+function loginAddress(req: Request) {
+  return req.ip || req.socket.remoteAddress || "unknown";
+}
+
+function getLoginFailure(address: string) {
+  const now = Date.now();
+  const previous = loginFailures.get(address);
+  if (!previous || now - previous.startedAt >= loginWindowMs) {
+    loginFailures.set(address, { count: 0, startedAt: now });
+    return 0;
+  }
+  return previous.count;
+}
+
+function recordLoginFailure(address: string) {
+  const count = getLoginFailure(address) + 1;
+  loginFailures.set(address, { count, startedAt: Date.now() });
+  if (loginFailures.size > 5000) {
+    for (const [key, value] of loginFailures) {
+      if (Date.now() - value.startedAt >= loginWindowMs) loginFailures.delete(key);
+    }
+  }
+  return count;
+}
+
+function passwordMatches(input: string) {
+  const configured = process.env.DRIVWON_ADMIN_PASSWORD ?? "";
+  if (!configured || input.length > 512) return false;
+  const salt = process.env.SESSION_SECRET ?? "";
+  if (!salt) return false;
+  const inputHash = scryptSync(input, salt, 32);
+  const configuredHash = scryptSync(configured, salt, 32);
+  return timingSafeEqual(inputHash, configuredHash);
 }
 
 function isAllowedEmail(email: string) {
@@ -115,15 +172,59 @@ function decryptTokens(value: string) {
 export function registerAuthRoutes(app: Express) {
   app.get("/api/auth/status", (req, res) => {
     setNoStore(res);
+    const authenticated = isAdminAuthenticated(req);
     res.json({
       configured: configurationReady(),
-      user: req.session?.workspaceUser ?? null,
+      driveOAuthConfigured: workspaceConfig.oauthReady,
+      driveConnected: Boolean(authenticated && req.session?.googleTokensEncrypted),
+      user: authenticated ? req.session?.workspaceUser ?? { email: "Admin access", name: "Drivwon admin" } : null,
     });
   });
 
-  app.get("/api/auth/google", (req, res, next) => {
+  app.post("/api/auth/login", async (req, res, next) => {
+    setNoStore(res);
     if (!configurationReady() || !req.session) {
-      return res.status(503).redirect("/dashboard?setup=required");
+      return res.status(503).json({ error: "Private workspace setup is incomplete. Configure its server secrets and database first." });
+    }
+    const origin = req.get("origin");
+    try {
+      if (!origin || new URL(origin).host !== req.get("host")) {
+        return res.status(403).json({ error: "Sign-in request was not from this website." });
+      }
+    } catch {
+      return res.status(403).json({ error: "Sign-in request was not from this website." });
+    }
+    const address = loginAddress(req);
+    const failures = getLoginFailure(address);
+    if (failures >= maxLoginAttempts) {
+      res.setHeader("Retry-After", String(Math.ceil((loginWindowMs - (Date.now() - loginFailures.get(address)!.startedAt)) / 1000)));
+      return res.status(429).json({ error: "Too many sign-in attempts. Please wait 15 minutes and try again." });
+    }
+    const password = typeof req.body?.password === "string" ? req.body.password : "";
+    if (!passwordMatches(password)) {
+      recordLoginFailure(address);
+      return res.status(401).json({ error: "The password was not accepted." });
+    }
+    loginFailures.delete(address);
+    try {
+      await new Promise<void>((resolve, reject) => {
+        req.session.regenerate((error) => error ? reject(error) : resolve());
+      });
+      req.session.adminAuthenticated = true;
+      req.session.adminPasswordVersion = currentAdminPasswordVersion();
+      await new Promise<void>((resolve, reject) => {
+        req.session.save((error) => error ? reject(error) : resolve());
+      });
+      res.json({ authenticated: true });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  app.get("/api/auth/google", (req, res, next) => {
+    if (!isAdminAuthenticated(req)) return res.status(401).redirect("/drivwon/der?error=sign-in-required");
+    if (!workspaceConfig.oauthReady || !req.session) {
+      return res.status(503).redirect("/drivwon/der?drive-setup=required");
     }
     const state = randomBytes(32).toString("hex");
     req.session.oauthState = state;
@@ -144,28 +245,31 @@ export function registerAuthRoutes(app: Express) {
 
   app.get("/api/auth/google/callback", async (req, res, next) => {
     try {
-      if (!configurationReady() || !req.session) return res.status(503).redirect("/dashboard?setup=required");
+      if (!isAdminAuthenticated(req)) return res.status(401).redirect("/drivwon/der?error=sign-in-required");
+      if (!workspaceConfig.oauthReady || !req.session) return res.status(503).redirect("/drivwon/der?drive-setup=required");
       const code = typeof req.query.code === "string" ? req.query.code : "";
       const returnedState = typeof req.query.state === "string" ? req.query.state : "";
       const expectedState = req.session.oauthState ?? "";
       delete req.session.oauthState;
       if (!code || !returnedState || !expectedState || !safeCompare(returnedState, expectedState)) {
-        return res.status(400).redirect("/dashboard?error=invalid-oauth-state");
+        return res.status(400).redirect("/drivwon/der?error=invalid-oauth-state");
       }
 
       const client = createOAuthClient(req);
       const { tokens } = await client.getToken(code);
-      if (!tokens.id_token) return res.status(401).redirect("/dashboard?error=missing-google-identity");
+      if (!tokens.id_token) return res.status(401).redirect("/drivwon/der?error=missing-google-identity");
       const ticket = await client.verifyIdToken({ idToken: tokens.id_token, audience: process.env.GOOGLE_CLIENT_ID });
       const profile = ticket.getPayload();
       const email = profile?.email?.toLowerCase().trim();
       if (!email || !profile?.email_verified || !isAllowedEmail(email)) {
-        return res.status(403).redirect("/dashboard?error=team-access-required");
+        return res.status(403).redirect("/drivwon/der?error=team-access-required");
       }
 
       await new Promise<void>((resolve, reject) => {
         req.session.regenerate((error) => error ? reject(error) : resolve());
       });
+      req.session.adminAuthenticated = true;
+      req.session.adminPasswordVersion = currentAdminPasswordVersion();
       req.session.workspaceUser = {
         email,
         name: profile.name || email,
@@ -175,7 +279,7 @@ export function registerAuthRoutes(app: Express) {
       await new Promise<void>((resolve, reject) => {
         req.session.save((error) => error ? reject(error) : resolve());
       });
-      res.redirect("/dashboard");
+      res.redirect("/drivwon/der");
     } catch (error) {
       next(error);
     }
@@ -191,11 +295,21 @@ export function registerAuthRoutes(app: Express) {
   });
 }
 
-export function requireWorkspaceUser(req: Request, res: Response, next: NextFunction) {
+export function requireAdmin(req: Request, res: Response, next: NextFunction) {
   setNoStore(res);
   if (!configurationReady()) return res.status(503).json({ error: "Workspace setup is incomplete. Configure the server environment first." });
-  if (!req.session?.workspaceUser) return res.status(401).json({ error: "Sign in with an approved Google Workspace account." });
+  if (!isAdminAuthenticated(req)) return res.status(401).json({ error: "Enter the private workspace password to continue." });
   next();
+}
+
+export function requireDriveUser(req: Request, res: Response, next: NextFunction) {
+  requireAdmin(req, res, (error) => {
+    if (error) return next(error);
+    if (!req.session?.workspaceUser || !req.session.googleTokensEncrypted) {
+      return res.status(401).json({ error: "Connect an approved Google account to use Drive." });
+    }
+    next();
+  });
 }
 
 export async function getDriveAccessToken(req: Request) {

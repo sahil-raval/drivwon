@@ -41,6 +41,17 @@ export const defaultNavigation = [
   { href: "/contact", label: "Contact" },
 ];
 
+export function isPrivateWorkspacePath(href: string) {
+  let pathname = href;
+  try {
+    pathname = new URL(href, "https://drivwon.invalid").pathname;
+  } catch {
+    // Fall through to exact-path matching for malformed editor input.
+  }
+  const normalized = pathname.replace(/\/+$/, "") || "/";
+  return normalized === "/dashboard" || normalized === "/drivwon/der" || normalized.startsWith("/drivwon/der/");
+}
+
 export function useSiteSettings() {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   useEffect(() => {

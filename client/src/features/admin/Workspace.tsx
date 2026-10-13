@@ -2,8 +2,8 @@ import { FormEvent, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import {
   Activity, ArrowDownToLine, ArrowUpRight, BadgeDollarSign, BriefcaseBusiness,
-  Check, FileText, FolderOpen, LoaderCircle, LogOut, Plus, ShieldCheck,
-  Upload, Users, X,
+  Check, FileText, FolderOpen, HardDrive, KeyRound, LoaderCircle, LogOut, Plus, ShieldCheck,
+  Upload, X,
 } from "lucide-react";
 
 type Project = {
@@ -20,6 +20,7 @@ type Update = { id: string; projectId: string; channel: string; period: string; 
 type Document = { id: string; projectId: string; invoiceId?: string | null; category: string; fileName: string; mimeType: string; sizeBytes: number; driveUrl: string; createdAt: string };
 type WorkspaceData = {
   user: { email: string; name: string; picture?: string };
+  driveConnected: boolean;
   driveConfigured: boolean;
   driveFolderName: string | null;
   projects: Project[];
@@ -28,7 +29,7 @@ type WorkspaceData = {
   documents: Document[];
   metrics: { activeProjects: number; averageProgress: number; openInvoices: number; totalOutstandingCents: number; documents: number };
 };
-type AuthStatus = { configured: boolean; user: WorkspaceData["user"] | null };
+type AuthStatus = { configured: boolean; driveOAuthConfigured: boolean; driveConnected: boolean; user: WorkspaceData["user"] | null };
 
 declare global {
   interface Window {
@@ -86,6 +87,7 @@ function Workspace() {
   const [tab, setTab] = useState<TabId>("overview");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [showProjectForm, setShowProjectForm] = useState(false);
@@ -151,6 +153,25 @@ function Workspace() {
     }
   }
 
+  async function signIn(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSaving(true);
+    setError("");
+    try {
+      await api("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+      setPassword("");
+      await refresh();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not sign in.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   const projectName = useMemo(() => new Map((data?.projects ?? []).map((project) => [project.id, project.name])), [data?.projects]);
   const invoiceNumber = useMemo(() => new Map((data?.invoices ?? []).map((invoice) => [invoice.id, invoice.invoiceNumber])), [data?.invoices]);
 
@@ -162,11 +183,18 @@ function Workspace() {
         <div className="mb-8 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/20 text-primary"><ShieldCheck /></div>
         <p className="text-sm font-semibold uppercase tracking-[.18em] text-primary">Private team area</p>
         <h1 className="mt-3 text-3xl font-bold">Drivwon workspace</h1>
-        <p className="mt-3 leading-relaxed text-muted-foreground">Project progress, invoices, monthly reports and Drive documents are only visible to approved team accounts.</p>
+        <p className="mt-3 leading-relaxed text-muted-foreground">This private area is not linked from the public site. Enter the team password to continue.</p>
         {error && <p role="alert" className="mt-5 rounded-xl border border-red-400/30 bg-red-400/10 p-3 text-sm text-red-200">{error}</p>}
-        {new URLSearchParams(window.location.search).has("setup") && <p className="mt-5 rounded-xl border border-amber-300/30 bg-amber-200/10 p-3 text-sm text-amber-100">Workspace setup is incomplete. Configure the server secrets and database described in the repository setup guide.</p>}
-        {new URLSearchParams(window.location.search).has("error") && <p className="mt-5 rounded-xl border border-amber-300/30 bg-amber-200/10 p-3 text-sm text-amber-100">Sign-in did not complete. Check that your Google account is allowlisted and the OAuth callback URL is correct.</p>}
-        {auth?.configured ? <a href="/api/auth/google" className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-black transition-colors hover:bg-white/85"><Users size={17} /> Sign in with Google Workspace</a> : <div className="mt-7 rounded-xl border border-white/10 bg-black/20 p-4 text-sm text-muted-foreground"><strong className="text-white">Not configured yet.</strong><p className="mt-2">Add the server environment values and run the database migration before enabling team sign-in. No public access is granted while setup is incomplete.</p></div>}
+        {auth?.configured ? (
+          <form onSubmit={signIn} className="mt-7 space-y-3">
+            <label className="block text-sm font-medium" htmlFor="workspace-password">Admin password</label>
+            <input id="workspace-password" name="password" type="password" autoComplete="current-password" required minLength={16} maxLength={512} value={password} onChange={(event) => setPassword(event.target.value)} className="w-full rounded-xl border border-white/10 bg-black/30 px-4 py-3 text-white outline-none focus:border-primary" />
+            <button disabled={saving} className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-white px-5 py-3 font-semibold text-black transition-colors hover:bg-white/85 disabled:opacity-60"><KeyRound size={17} /> {saving ? "Checking…" : "Open private workspace"}</button>
+            <p className="text-xs text-muted-foreground">After signing in, connect an allowlisted Google account separately to use Drive.</p>
+          </form>
+        ) : (
+          <div className="mt-7 rounded-xl border border-white/10 bg-black/20 p-4 text-sm text-muted-foreground"><strong className="text-white">Not configured yet.</strong><p className="mt-2">Set DRIVWON_ADMIN_PASSWORD (at least 16 characters), SESSION_SECRET and the database in server Secrets, then run the database migration. Access remains disabled until all are configured.</p></div>
+        )}
         <a href="/" className="mt-6 inline-block text-sm text-muted-foreground hover:text-white">← Back to Drivwon</a>
       </section>
     </main>
@@ -227,8 +255,15 @@ function Workspace() {
 
         {tab === "documents" && <section className="rounded-2xl border border-white/10 bg-white/[.025]">
           <div className="border-b border-white/10 p-5"><h2 className="text-lg font-semibold">Project documents</h2><p className="mt-1 text-sm text-muted-foreground">Uploaded files go to the configured Google Drive folder, under project and invoice folders.</p></div>
-          <DriveFolderPicker currentName={data.driveFolderName} onError={setError} onConnected={refresh} />
-          <FileUpload projects={data.projects} invoices={data.invoices} driveReady={data.driveConfigured} onUploaded={refresh} onError={setError} />
+          {!data.driveConnected ? (
+            <div className="m-5 rounded-xl border border-white/10 bg-black/20 p-4">
+              <p className="text-sm text-muted-foreground">Google Drive is a separate connection used only for file storage.</p>
+              {auth?.driveOAuthConfigured ? <a href="/api/auth/google" className="mt-4 inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2.5 text-sm font-semibold text-black"><HardDrive size={16} /> Connect Google Drive</a> : <p className="mt-3 text-xs text-amber-100">Drive OAuth is not configured yet. Add the Google OAuth values and approved team email allowlist in server Secrets.</p>}
+            </div>
+          ) : <>
+            <DriveFolderPicker currentName={data.driveFolderName} onError={setError} onConnected={refresh} />
+            <FileUpload projects={data.projects} invoices={data.invoices} driveReady={data.driveConfigured} onUploaded={refresh} onError={setError} />
+          </>}
           {data.documents.length ? <div className="divide-y divide-white/5">{data.documents.map((document) => <div key={document.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4"><div className="flex min-w-0 items-center gap-3"><FileText size={18} className="shrink-0 text-primary" /><div className="min-w-0"><a className="truncate font-medium hover:text-primary" href={document.driveUrl} target="_blank" rel="noreferrer">{document.fileName}</a><p className="mt-1 text-xs text-muted-foreground">{projectName.get(document.projectId) ?? "Project"} · {invoiceNumber.get(document.invoiceId ?? "") ?? document.category} · {(document.sizeBytes / 1024 / 1024).toFixed(1)} MB</p></div></div><a href={document.driveUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sm text-primary">Open in Drive <ArrowUpRight size={14} /></a></div>)}</div> : <p className="px-5 py-8 text-sm text-muted-foreground">No documents uploaded yet.</p>}
         </section>}
 

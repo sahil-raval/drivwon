@@ -25,8 +25,11 @@ export async function registerRoutes(
   registerAuthRoutes(app);
   registerWorkspaceRoutes(app);
 
-  app.use(["/dashboard", "/studio"], (_req, res, next) => {
+  app.get("/dashboard", (_req, res) => res.status(404).end());
+
+  app.use(["/drivwon/der", "/dashboard", "/studio"], (_req, res, next) => {
     res.setHeader("X-Robots-Tag", "noindex, nofollow, noarchive");
+    res.setHeader("Cache-Control", "no-store, private");
     next();
   });
 
@@ -35,7 +38,6 @@ export async function registerRoutes(
     res.type("text/plain").send([
       "User-agent: *",
       "Allow: /",
-      "Disallow: /dashboard",
       "Disallow: /studio",
       "Disallow: /api/",
       `Sitemap: ${baseUrl}/sitemap.xml`,

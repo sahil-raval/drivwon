@@ -98,7 +98,7 @@ function applyMetadata(html: string, requestPath: string, result: FetchedMetadat
   const title = seo.metaTitle || metadata?.title || (requestPath === "/" ? "Drivwon | Digital studio in Geelong, Australia" : "Drivwon | Digital studio");
   const description = seo.metaDescription || metadata?.excerpt || "Drivwon is a Geelong-based digital studio building websites, software, brands and growth systems for ambitious businesses.";
   const canonical = seo.canonicalUrl || `${baseUrl}${requestPath}`;
-  const noIndex = Boolean(metadata?.noIndex || seo.noIndex || requestPath === "/dashboard" || requestPath === "/studio");
+  const noIndex = Boolean(metadata?.noIndex || seo.noIndex || requestPath === "/dashboard" || requestPath === "/drivwon/der" || requestPath === "/studio");
   const shareTitle = seo.ogTitle || title;
   const shareDescription = seo.ogDescription || description;
   const image = sanityImageUrl(seo.ogImage?.asset?._ref) || `${baseUrl}/logo.png`;

@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import logoFallback from "@/assets/logo.png";
-import { useSiteSettings } from "@/features/cms/useSiteSettings";
+import { isPrivateWorkspacePath, useSiteSettings } from "@/features/cms/useSiteSettings";
 import { imageUrl } from "@/features/cms/client";
 
 export default function Footer() {
@@ -12,6 +12,8 @@ export default function Footer() {
   const footerLinks = settings?.footerLinks?.length
     ? settings.footerLinks
     : [{ href: "/about", label: "About Us" }, { href: "/contact", label: "Contact" }, { href: "/quotation", label: "Get a Quote" }, { href: "/privacy-policy", label: "Privacy Policy" }];
+  const visibleFooterServices = footerServices.filter((item) => !item.href || !isPrivateWorkspacePath(item.href));
+  const visibleFooterLinks = footerLinks.filter((item) => !isPrivateWorkspacePath(item.href));
   return (
     <footer className="bg-black border-t border-white/10 py-20">
       <div className="container mx-auto px-6 grid md:grid-cols-4 gap-10">
@@ -28,14 +30,14 @@ export default function Footer() {
         <div>
           <h4 className="font-display font-bold text-white mb-4">Services</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            {footerServices.map((item) => <li key={item.label}>{item.href ? <Link href={item.href} className="hover:text-primary">{item.label}</Link> : item.label}</li>)}
+            {visibleFooterServices.map((item) => <li key={item.label}>{item.href ? <Link href={item.href} className="hover:text-primary">{item.label}</Link> : item.label}</li>)}
           </ul>
         </div>
 
         <div>
           <h4 className="font-display font-bold text-white mb-4">Company</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            {footerLinks.map((item) => <li key={item.href}><Link href={item.href} className="hover:text-primary transition-colors">{item.label}</Link></li>)}
+            {visibleFooterLinks.map((item) => <li key={item.href}><Link href={item.href} className="hover:text-primary transition-colors">{item.label}</Link></li>)}
           </ul>
         </div>
 

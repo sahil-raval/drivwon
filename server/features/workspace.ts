@@ -13,7 +13,7 @@ import {
   workProjects,
 } from "@shared/schema";
 import { db } from "../db";
-import { getDriveAccessToken, requireWorkspaceUser } from "./auth";
+import { getDriveAccessToken, requireAdmin, requireDriveUser } from "./auth";
 
 type SessionRequest = Request & { session: Request["session"] };
 
@@ -73,7 +73,7 @@ function publicUrl(fileId: string) {
 }
 
 export function registerWorkspaceRoutes(app: Express) {
-  app.get("/api/workspace", requireWorkspaceUser, async (_req, res, next) => {
+  app.get("/api/workspace", requireAdmin, async (_req, res, next) => {
     try {
       if (!requireDatabase(res)) return;
       const [projects, invoices, updates, documents] = await Promise.all([
@@ -86,12 +86,14 @@ export function registerWorkspaceRoutes(app: Express) {
       const openInvoices = invoices.filter((invoice) => invoice.status !== "paid");
       const totalOutstandingCents = openInvoices.reduce((total, invoice) => total + invoice.totalCents, 0);
       res.setHeader("Cache-Control", "no-store, private");
-    const identity = (_req as SessionRequest).session?.workspaceUser;
-    const [driveFolder] = identity?.email
+    const googleIdentity = (_req as SessionRequest).session?.workspaceUser;
+    const identity = googleIdentity ?? { email: "Admin access", name: "Drivwon admin" };
+    const [driveFolder] = googleIdentity?.email
       ? await db!.select().from(driveFolderConnections).where(eq(driveFolderConnections.email, identity.email)).limit(1)
       : [];
     res.json({
         user: identity,
+        driveConnected: Boolean((_req as SessionRequest).session?.googleTokensEncrypted),
         driveConfigured: Boolean(driveFolder),
         driveFolderName: driveFolder?.folderName ?? null,
         projects,
@@ -111,7 +113,7 @@ export function registerWorkspaceRoutes(app: Express) {
     }
   });
 
-  app.post("/api/workspace/projects", requireWorkspaceUser, async (req, res, next) => {
+  app.post("/api/workspace/projects", requireAdmin, async (req, res, next) => {
     try {
       if (!requireDatabase(res)) return;
       const parsed = projectInputSchema.safeParse(req.body);
@@ -129,7 +131,7 @@ export function registerWorkspaceRoutes(app: Express) {
     }
   });
 
-  app.patch("/api/workspace/projects/:id", requireWorkspaceUser, async (req, res, next) => {
+  app.patch("/api/workspace/projects/:id", requireAdmin, async (req, res, next) => {
     try {
       if (!requireDatabase(res)) return;
       const parsed = projectInputSchema.partial().safeParse(req.body);
@@ -142,7 +144,7 @@ export function registerWorkspaceRoutes(app: Express) {
     }
   });
 
-  app.post("/api/workspace/invoices", requireWorkspaceUser, async (req, res, next) => {
+  app.post("/api/workspace/invoices", requireAdmin, async (req, res, next) => {
     try {
       if (!requireDatabase(res)) return;
       const parsed = invoiceInputSchema.safeParse(req.body);
@@ -160,7 +162,7 @@ export function registerWorkspaceRoutes(app: Express) {
     }
   });
 
-  app.patch("/api/workspace/invoices/:id/status", requireWorkspaceUser, async (req, res, next) => {
+  app.patch("/api/workspace/invoices/:id/status", requireAdmin, async (req, res, next) => {
     try {
       if (!requireDatabase(res)) return;
       const status = req.body?.status;
@@ -176,7 +178,7 @@ export function registerWorkspaceRoutes(app: Express) {
     }
   });
 
-  app.post("/api/workspace/updates", requireWorkspaceUser, async (req, res, next) => {
+  app.post("/api/workspace/updates", requireAdmin, async (req, res, next) => {
     try {
       if (!requireDatabase(res)) return;
       const parsed = updateInputSchema.safeParse(req.body);
@@ -188,7 +190,7 @@ export function registerWorkspaceRoutes(app: Express) {
     }
   });
 
-  app.post("/api/workspace/files", requireWorkspaceUser, async (req, res, next) => {
+  app.post("/api/workspace/files", requireDriveUser, async (req, res, next) => {
     try {
       if (!requireDatabase(res)) return;
       const email = req.session!.workspaceUser!.email;
@@ -253,7 +255,7 @@ export function registerWorkspaceRoutes(app: Express) {
     }
   });
 
-  app.get("/api/workspace/drive/folder", requireWorkspaceUser, async (req, res, next) => {
+  app.get("/api/workspace/drive/folder", requireDriveUser, async (req, res, next) => {
     try {
       if (!requireDatabase(res)) return;
       const [folder] = await db!.select().from(driveFolderConnections).where(eq(driveFolderConnections.email, req.session!.workspaceUser!.email)).limit(1);
@@ -263,7 +265,7 @@ export function registerWorkspaceRoutes(app: Express) {
     }
   });
 
-  app.get("/api/workspace/drive/picker-token", requireWorkspaceUser, async (req, res, next) => {
+  app.get("/api/workspace/drive/picker-token", requireDriveUser, async (req, res, next) => {
     try {
       const token = await getDriveAccessToken(req);
       res.setHeader("Cache-Control", "no-store, private");
@@ -273,7 +275,7 @@ export function registerWorkspaceRoutes(app: Express) {
     }
   });
 
-  app.put("/api/workspace/drive/folder", requireWorkspaceUser, async (req, res, next) => {
+  app.put("/api/workspace/drive/folder", requireDriveUser, async (req, res, next) => {
     try {
       if (!requireDatabase(res)) return;
       const folderId = typeof req.body?.folderId === "string" ? req.body.folderId.trim() : "";
@@ -303,7 +305,7 @@ export function registerWorkspaceRoutes(app: Express) {
     }
   });
 
-  app.get("/api/workspace/analytics", requireWorkspaceUser, async (_req, res, next) => {
+  app.get("/api/workspace/analytics", requireAdmin, async (_req, res, next) => {
     try {
       if (!requireDatabase(res)) return;
       const [byService] = await db!.select({

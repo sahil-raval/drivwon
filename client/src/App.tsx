@@ -53,12 +53,12 @@ function Router() {
           <Route path="/blog" component={BlogIndex} />
           <Route path="/blog/:slug" component={BlogArticle} />
           <Route path="/studio" component={StudioPage} />
-          <Route path="/dashboard" component={Workspace} />
+          <Route path="/drivwon/der" component={Workspace} />
           <Route path="/:slug" component={CmsLandingRoute} />
           <Route component={NotFound} />
         </Switch>
       </Suspense>
-      {location !== "/dashboard" && location !== "/studio" && <Suspense fallback={null}><Chatbot /></Suspense>}
+      {location !== "/drivwon/der" && location !== "/dashboard" && location !== "/studio" && <Suspense fallback={null}><Chatbot /></Suspense>}
     </PageTransition>
   );
 }
@@ -70,7 +70,9 @@ function CmsLandingRoute() {
 }
 
 function SoundController() {
+  const [location] = useLocation();
   const { toggleMute, isMuted } = useAudio();
+  if (location === "/drivwon/der") return null;
   return (
     <Button
       variant="outline"
@@ -92,7 +94,6 @@ function App() {
           <CustomCursor />
           <Toaster />
           <SoundController />
-          <Chatbot />
           <Router />
         </SmoothScroll>
       </TooltipProvider>

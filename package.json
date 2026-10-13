@@ -10,7 +10,8 @@
     "start": "NODE_ENV=production node dist/index.cjs",
     "check": "tsc",
     "db:push": "drizzle-kit push",
-    "sanity:deploy": "sanity deploy"
+    "sanity:deploy": "sanity deploy",
+    "sanity:seed": "tsx script/seed-sanity.ts"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
