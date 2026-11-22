@@ -4,7 +4,7 @@ import { type ObjectInputProps, useFormValue } from "sanity";
 type Doc = Record<string, any> | undefined;
 type Seo = Record<string, any> | undefined;
 
-const SITE = "drivwon.com";
+const SITE = "www.drivwon.com.au";
 
 function plainText(value: unknown): string {
   if (!value) return "";
