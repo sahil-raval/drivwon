@@ -1,6 +1,10 @@
+const serverEnv: Record<string, string | undefined> = typeof process !== "undefined" && process.env ? process.env : {};
+const browserEnv: Record<string, string | undefined> = ((import.meta as any).env ?? {}) as Record<string, string | undefined>;
+
+/** Sanity project settings. Override with SANITY_PROJECT_ID / SANITY_DATASET (server) or VITE_SANITY_PROJECT_ID / VITE_SANITY_DATASET (browser). */
 export const sanityConfig = {
-  projectId: "v6luawxh",
-  dataset: "production",
+  projectId: serverEnv.SANITY_PROJECT_ID || browserEnv.VITE_SANITY_PROJECT_ID || "v6luawxh",
+  dataset: serverEnv.SANITY_DATASET || browserEnv.VITE_SANITY_DATASET || "production",
   apiVersion: "2026-10-12",
 };
 

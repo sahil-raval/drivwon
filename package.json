@@ -5,9 +5,9 @@
   "license": "MIT",
   "scripts": {
     "dev:client": "vite dev --port 5173",
-    "dev": "NODE_ENV=development tsx server/index.ts",
+    "dev": "cross-env NODE_ENV=development tsx server/index.ts",
     "build": "tsx script/build.ts",
-    "start": "NODE_ENV=production node dist/index.cjs",
+    "start": "cross-env NODE_ENV=production node dist/index.cjs",
     "check": "tsc",
     "db:push": "drizzle-kit push",
     "sanity:deploy": "sanity deploy",
@@ -16,7 +16,9 @@
     "sanity:dev": "sanity dev",
     "sanity:build": "sanity build",
     "sanity:validate": "sanity schema validate",
-    "sanity:seed:publish": "tsx script/seed-sanity.ts --publish"
+    "sanity:seed:publish": "tsx script/seed-sanity.ts --publish",
+    "studio": "sanity dev",
+    "setup": "node -e \"require('fs').existsSync('.env')||require('fs').copyFileSync('.env.sample','.env')\" && npm install"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
@@ -58,7 +60,9 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "connect-pg-simple": "^10.0.0",
+    "cross-env": "^10.1.0",
     "date-fns": "^3.6.0",
+    "dotenv": "^18.0.10",
     "drizzle-orm": "^0.39.3",
     "drizzle-zod": "^0.7.0",
     "embla-carousel-react": "^8.6.0",

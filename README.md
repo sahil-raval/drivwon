@@ -82,6 +82,19 @@ psql "$DATABASE_URL" -f migrations/0001_drivwon_operations.sql
 
 The dashboard includes project progress, monthly SEO/social/web updates, invoice and paid-receipt printing, project-linked Drive documents, and basic paid/outstanding totals. It does not email invoices, determine GST treatment, or replace accounting software; tax is entered manually and should be verified with your accountant.
 
+## Run locally in VS Code
+
+Needs Node.js 20 or newer.
+
+1. Open the folder in VS Code and install the recommended extensions when asked.
+2. Terminal → Run Task → **1. Setup** (copies `.env.sample` to `.env` and runs `npm install`). Or run `npm run setup`.
+3. Open `.env`. The Sanity project ID `v6luawxh` is already filled in. Add `SANITY_LEADS_TOKEN` if you want form leads saved.
+4. In https://www.sanity.io/manage/project/v6luawxh/api → **CORS origins**, add `http://localhost:5173` (no credentials) and `http://localhost:3333` (allow credentials). Without this the browser cannot load CMS content locally.
+5. Terminal → Run Task → **Run website + Studio together**. Website: http://localhost:5173 · Studio: http://localhost:3333
+6. To debug the server, press F5 (**Debug website server**).
+
+The private dashboard needs `DATABASE_URL`; leave it empty and the dashboard is simply off.
+
 ## Run and deploy
 
 ```sh
@@ -92,4 +105,4 @@ npm run dev
 
 For a server-backed production deployment, run `npm run build` and `npm run start` with the environment above. The repository's current Replit deployment target is **static**, which cannot serve the Express password login, session, Postgres or Drive APIs. Switch the deployment to a server-capable target and set its run command to `npm run start` before enabling `/drivwon/der`. The existing Replit run workflow also starts the client-only command; use `npm run dev` to run the Express/Vite development server.
 
-Never commit `.env` files, Google credentials, session secrets or Sanity write tokens. `.env.example` contains names and placeholders only.
+Never commit `.env` files, Google credentials, session secrets or Sanity write tokens. `.env.sample` contains names and placeholders only.

@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "1. Setup (copy .env + install)", "type": "npm", "script": "setup", "problemMatcher": [] },
+    { "label": "2. Website: dev server (localhost:5173)", "type": "npm", "script": "dev", "isBackground": true, "problemMatcher": [], "group": { "kind": "build", "isDefault": true } },
+    { "label": "3. Sanity Studio: dev (localhost:3333)", "type": "npm", "script": "studio", "isBackground": true, "problemMatcher": [] },
+    { "label": "Run website + Studio together", "dependsOn": ["2. Website: dev server (localhost:5173)", "3. Sanity Studio: dev (localhost:3333)"], "dependsOrder": "parallel", "problemMatcher": [] },
+    { "label": "Seed Sanity with starter content (drafts)", "type": "npm", "script": "sanity:seed", "problemMatcher": [] },
+    { "label": "Deploy Sanity Studio", "type": "npm", "script": "sanity:deploy", "problemMatcher": [] },
+    { "label": "Check: types", "type": "npm", "script": "check", "problemMatcher": ["$tsc"] },
+    { "label": "Check: SEO test", "type": "npm", "script": "test:seo", "problemMatcher": [] },
+    { "label": "Check: Sanity schema", "type": "npm", "script": "sanity:validate", "problemMatcher": [] },
+    { "label": "Build for production", "type": "npm", "script": "build", "problemMatcher": [] }
+  ]
+}

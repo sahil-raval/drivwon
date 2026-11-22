@@ -61,6 +61,8 @@ async function buildAll() {
     minify: true,
     external: externals,
     logLevel: "info",
+    // shared/cms/config.ts reads import.meta.env in the browser; the server uses process.env instead.
+    logOverride: { "empty-import-meta": "silent" },
   });
 }
 

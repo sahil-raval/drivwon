@@ -25,8 +25,9 @@ function pathFor(doc: { _type?: string; slug?: { current?: string } }) {
 export const sanityStudioConfig = defineConfig({
   name: "drivwon",
   title: "Drivwon Content Studio",
-  projectId: "v6luawxh",
-  dataset: "production",
+  // Sanity Studio only exposes env vars that start with SANITY_STUDIO_.
+  projectId: process.env.SANITY_STUDIO_PROJECT_ID || "v6luawxh",
+  dataset: process.env.SANITY_STUDIO_DATASET || "production",
   plugins: [structureTool({ structure }), visionTool({ defaultApiVersion: "2026-10-12" })],
   schema: {
     types: schemaTypes,
