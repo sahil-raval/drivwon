@@ -20,7 +20,8 @@
     "studio": "sanity dev",
     "setup": "node -e \"require('fs').existsSync('.env')||require('fs').copyFileSync('.env.sample','.env')\" && npm install",
     "test:vercel": "node script/test-vercel.mjs",
-    "test": "npm run check && npm run test:vercel && npm run test:seo"
+    "test": "npm run check && npm run test:vercel && npm run test:seo",
+    "sanity:publish": "tsx script/publish-seed.ts"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
