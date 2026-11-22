@@ -50,6 +50,15 @@ export function headingLevel(initial: "h1" | "h2" = "h2") {
   });
 }
 
+/** Pages and landing pages share the same URLs (/<slug>), so a slug must be unique across both. Other types: unique per type. */
+async function isSlugUnique(slug: string, context: any) {
+  const { document, getClient } = context;
+  const id = String(document?._id ?? "").replace(/^drafts\./, "");
+  const types = ["page", "landingPage"].includes(document?._type) ? ["page", "landingPage"] : [document?._type];
+  const query = `!defined(*[_type in $types && slug.current == $slug && !(_id in [$draft, $published])][0]._id)`;
+  return getClient({ apiVersion: "2026-10-12" }).fetch(query, { types, slug, draft: `drafts.${id}`, published: id });
+}
+
 export function slugField(source = "title", group?: string) {
   return defineField({
     name: "slug",
@@ -57,7 +66,7 @@ export function slugField(source = "title", group?: string) {
     type: "slug",
     group,
     description: "Short, lowercase, words separated by hyphens. Include the main keyword, e.g. seo-geelong. Changing a live slug breaks links — add a redirect if you do.",
-    options: { source, maxLength: 80, slugify: (input: string) => input.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").slice(0, 80) },
+    options: { source, maxLength: 80, isUnique: isSlugUnique, slugify: (input: string) => input.toLowerCase().trim().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").slice(0, 80) },
     validation: (rule) => rule.required().custom((value: { current?: string } | undefined) => {
       const current = value?.current ?? "";
       if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(current)) return "Use lowercase letters, numbers and single hyphens only.";

@@ -66,12 +66,12 @@ const PAGE = `_id, _type, _updatedAt, title, "slug": slug.current, ${SEO}, ${SEC
 export function routeQuery(match: RouteMatch): { query: string; params: Record<string, string> } | null {
   switch (match.kind) {
     case "page":
-      return { query: `*[_type == "page" && slug.current == $slug && ${published}][0]{${PAGE}}`, params: { slug: match.slug } };
+      return { query: `*[_type == "page" && slug.current == $slug && ${published}] | order(_updatedAt desc)[0]{${PAGE}}`, params: { slug: match.slug } };
     case "pageOrLanding":
       return {
         query: `coalesce(
-          *[_type == "page" && slug.current == $slug && ${published}][0]{${PAGE}},
-          *[_type == "landingPage" && slug.current == $slug && ${published}][0]{${PAGE}, hideNavigation, hideFooter, hideChatbot, stickyCta${LINK}, campaign, channel, conversionGoal, variant, expiresAt, expiredMessage, headScripts}
+          *[_type == "page" && slug.current == $slug && ${published}] | order(_updatedAt desc)[0]{${PAGE}},
+          *[_type == "landingPage" && slug.current == $slug && ${published}] | order(_updatedAt desc)[0]{${PAGE}, hideNavigation, hideFooter, hideChatbot, stickyCta${LINK}, campaign, channel, conversionGoal, variant, expiresAt, expiredMessage, headScripts}
         )`,
         params: { slug: match.slug },
       };
