@@ -8,7 +8,7 @@
  *
  * Everything marked [CHECK] in Studio must be confirmed by a human before publishing.
  */
-import "dotenv/config";
+import "../server/env";
 import { createReadStream, mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { createClient } from "@sanity/client";
@@ -18,7 +18,10 @@ const dryRun = args.has("--dry-run");
 const publish = args.has("--publish");
 const force = args.has("--force");
 const token = process.env.SANITY_WRITE_TOKEN || process.env.SANITY_LEADS_TOKEN;
-if (!dryRun && !token) throw new Error("Set SANITY_WRITE_TOKEN (Editor token) or use --dry-run.");
+if (!dryRun && !token) {
+  console.error(`\nNo Sanity token found.\n  Folder: ${process.cwd()}\n  Add this line to .env (or .env.local) in that folder:\n    SANITY_WRITE_TOKEN=sk...your Editor token...\n  Create one at https://www.sanity.io/manage/project/v6luawxh/api (Tokens → Editor).\n`);
+  process.exit(1);
+}
 
 const client = createClient({ projectId: process.env.SANITY_PROJECT_ID || "v6luawxh", dataset: process.env.SANITY_DATASET || "production", apiVersion: "2026-10-12", token, useCdn: false });
 
