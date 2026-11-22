@@ -53,7 +53,7 @@ const sec = (type: string, fields: Record<string, any>, settings: Record<string,
 const feature = (icon: string, title: string, body: string, extra: Record<string, any> = {}) => ({ _key: k(), _type: "featureItem", icon, title, body, ...extra });
 const step = (title: string, body: string, bullets: string[] = [], duration?: string) => ({ _key: k(), _type: "step", title, body, bullets, duration });
 
-const PHONE = "0474 817 548"; // [CHECK] must match Google Business Profile exactly
+const PHONE = "0474 817 548"; // Confirmed by owner. Use this exact number on Google Business Profile and every directory.
 const PHONE_E164 = "+61474817548";
 const now = new Date().toISOString();
 

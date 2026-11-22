@@ -28,7 +28,7 @@ Scope: drivwon.com codebase, seeded CMS content and a public SERP check for Geel
 | Name | Drivwon | ✓ |
 | Legal name | Drivwon Pty Ltd | **[CHECK]** exact ASIC name |
 | ACN | 701 664 360 | ✓ |
-| Phone | 0474 817 548 (from current website) | **[CHECK]** — company documents use 0451 658 537. Pick ONE and use it on the website, Google Business Profile and every directory |
+| Phone | 0474 817 548 | ✓ Confirmed. Use this exact number on the website, Google Business Profile, quotes/invoices and every directory |
 | Email | info@drivwon.com | ✓ |
 | Address | Geelong VIC 3220, street hidden (service-area business) | **[CHECK]** if you have a staffed office, show it |
 | Hours | not set | **[CHECK]** add real hours |
