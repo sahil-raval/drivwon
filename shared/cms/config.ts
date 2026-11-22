@@ -8,7 +8,7 @@ export const sanityConfig = {
   apiVersion: "2026-10-12",
 };
 
-export const DEFAULT_SITE_URL = "https://drivwon.com";
+export const DEFAULT_SITE_URL = "https://www.drivwon.com.au";
 
 /** Minimal fetch-based GROQ client. Works in the browser, Node 18+ and Vercel functions. */
 export async function sanityFetch<T>(query: string, params: Record<string, unknown> = {}, options: { cdn?: boolean; token?: string; timeoutMs?: number } = {}): Promise<T> {

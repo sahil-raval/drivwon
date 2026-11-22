@@ -4,7 +4,7 @@ import { visionTool } from "@sanity/vision";
 import { schemaTypes, singletonTypes, systemTypes } from "./sanity/schemaTypes";
 import { structure } from "./sanity/structure";
 
-const siteUrl = "https://drivwon.com";
+const siteUrl = "https://www.drivwon.com.au";
 
 function pathFor(doc: { _type?: string; slug?: { current?: string } }) {
   const slug = doc.slug?.current;

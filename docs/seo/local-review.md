@@ -1,10 +1,10 @@
 # Drivwon local SEO review — Geelong (22 Nov 2026)
 
-Scope: drivwon.com codebase, seeded CMS content and a public SERP check for Geelong agency searches. No ranking or Local Pack placement is promised.
+Scope: www.drivwon.com.au codebase, seeded CMS content and a public SERP check for Geelong agency searches. No ranking or Local Pack placement is promised.
 
 ## Evidence
 
-- Live drivwon.com could not be fetched from the build environment. Search for “drivwon Geelong” returned **no results for the business** — the brand entity is not yet known to Google or AI engines.
+- Live www.drivwon.com.au could not be fetched from the build environment. Search for “drivwon Geelong” returned **no results for the business** — the brand entity is not yet known to Google or AI engines.
 - Search for “SEO agency Geelong” and “web design Geelong” is dominated by established agencies (Sixgun, WP Creative, Safari Digital, Zib Digital, Supple, Kia Ora Digital, Chromatix, Sitecentre) plus directories (Bark, Oneflare, Airtasker). At least one competitor (Paperstack) already markets AI-search (GEO) tracking.
 - Keyword volumes: **unavailable** — the OpenSEO account had no credits. Keyword targets below are based on SERP evidence and intent, not measured demand. Re-check with real volumes before writing more pages.
 
@@ -69,7 +69,7 @@ Do not compete as “another SEO agency”. Defensible angle: **developers and A
 
 ## Verification after deploy
 
-- `curl -A GPTBot https://drivwon.com/services/seo-geelong` → content and JSON-LD present
+- `curl -A GPTBot https://www.drivwon.com.au/services/seo-geelong` → content and JSON-LD present
 - Google Rich Results Test + Schema Markup Validator on home, one service, one post
 - Search Console: submit sitemap, URL-inspect the 5 key pages
 - PageSpeed Insights (mobile) on home and one service page
