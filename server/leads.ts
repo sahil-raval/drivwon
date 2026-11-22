@@ -10,7 +10,7 @@
  */
 import { randomUUID } from "node:crypto";
 import { z } from "zod";
-import { sanityConfig } from "../shared/cms/config";
+import { sanityConfig } from "../shared/cms/config.js";
 
 const leadSchema = z.object({
   formName: z.string().trim().max(120).default("Website form"),

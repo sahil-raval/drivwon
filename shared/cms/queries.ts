@@ -1,4 +1,4 @@
-import type { RouteMatch } from "./routes";
+import type { RouteMatch } from "./routes.js";
 
 const published = `!(_id in path("drafts.**")) && !(_id in path("versions.**"))`;
 const REF = `{_type, "slug": slug.current}`;

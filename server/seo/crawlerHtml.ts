@@ -3,8 +3,8 @@
  * Google, Bing and AI crawlers (GPTBot, ClaudeBot, PerplexityBot — most do NOT run JavaScript)
  * read this. React replaces it on load. It is the same content users see, so it is not cloaking.
  */
-import { hrefForLink, pathForDoc } from "../../shared/cms/routes";
-import { hasImage, imageDimensions, imageUrl } from "../../shared/cms/image";
+import { hrefForLink, pathForDoc } from "../../shared/cms/routes.js";
+import { hasImage, imageDimensions, imageUrl } from "../../shared/cms/image.js";
 
 export function esc(value: unknown) {
   return String(value ?? "").replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]!);
