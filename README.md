@@ -14,19 +14,39 @@ Geelong-based digital studio website and private operations workspace.
 - `server/features` — private password sessions, optional Google Drive OAuth, and protected project, invoice, update, analytics and Drive APIs.
 - `shared/schema.ts` and `migrations/` — Postgres types, input validation and initial operations tables.
 
-## Sanity CMS
+## Sanity CMS (pages, landing pages, blog, SEO, leads)
 
-The Studio is hosted separately from the public Vite app. Public pages query published Sanity content without a write token; the Studio requires an approved Sanity account.
+Every public page is built from Sanity. The old hand-coded pages are only used as a fallback until a Sanity document with the same slug is published. Editor guide: [`docs/CMS-GUIDE.md`](docs/CMS-GUIDE.md).
 
-1. Confirm that project `v6luawxh` has a **public-read** `production` dataset and that your Sanity account can manage the project.
-2. From the repository, run `npm install`, then `npm run sanity:deploy`. Sign in to Sanity and choose the Studio hostname. Set `VITE_SANITY_STUDIO_URL` to that URL before building the website.
-3. To import the existing site content, create a Sanity dataset write token in Sanity, save it as the private `SANITY_WRITE_TOKEN` secret, then run `npm run sanity:seed`. This uploads the existing logo and six portfolio images and creates **draft-only** Site settings and Page documents for Home, About, Services, Projects, Contact, Request a Quote, and Privacy Policy. The drafts are not published, so the live pages and forms remain unchanged until you review and publish them. Do not put a token in chat or commit it.
-4. To create a new landing page, publish another `Page` with a unique single-segment slug. Add sections, images/video URLs, buttons, FAQs and SEO fields in Studio; its public route is `/<slug>`. Routes such as `/blog`, `/drivwon/der`, `/dashboard` and `/studio` are reserved.
-5. Publish `Post` documents to create blog articles. Only published posts appear on `/blog`, in article metadata and in the sitemap. Maintain the FAQ entries to update chatbot answers.
+**Content types:** Site settings (brand, NAP, menu, footer, analytics IDs, verification codes, AI crawler rules), Pages, Landing pages, Services (`/services/<slug>`), Locations (`/locations/<slug>`), Case studies (`/projects/<slug>`), Blog posts, Categories (`/blog/category/<slug>`), Authors (`/authors/<slug>`), Testimonials, FAQs (also feed the chatbot), Lead forms, Leads, Saved (reusable) sections and Redirects.
 
-SEO fields include title and description, canonical URL, index/no-index, social title/description/image, focus keywords and custom JSON-LD. The server injects page metadata into the initial HTML for search and social crawlers, reads site-wide defaults and Search Console verification from Site settings, emits organization/article JSON-LD, and serves `robots.txt` and a Sanity-aware `sitemap.xml`. Set `APP_URL` to the exact production origin. Review custom canonical URLs, structured data, image alt text and Search Console verification before publishing.
+**Page builder:** 24 section types — hero, quick answer (AEO), rich text, image + text, media/gallery/video, cards, stats, process (optional HowTo schema), services, case studies, results highlight, testimonials, logos, pricing (Offer schema), FAQ (FAQPage schema), comparison table, CTA, lead form, contact + map, areas served, team, blog posts, quote, embed and saved sections. Every section has anchor, background, spacing, width, alignment, animation and hide controls.
 
-Public published-content reads and Sanity's account login for Studio do not require a write token in this app. Never commit Sanity write tokens; revoke and replace any token that has been exposed.
+**SEO / AEO / GEO fields on every page:** focus + related keywords, search intent, SEO title/description with a live Google preview and checklist in Studio, breadcrumb label, social title/description/image, quick answer, key facts, about/mentions entities (Wikipedia/Wikidata), audience, sources/citations, llms.txt inclusion, speakable, schema type override, area served, extra JSON-LD, noindex/nofollow/noarchive/nosnippet/noimageindex, max-snippet, max-image-preview, unavailable-after, canonical, sitemap exclude/priority/frequency and hreflang alternates.
+
+**Server-side SEO (`server/seo/`, `shared/seo/`):** every HTML request gets its full head (title, meta, robots, canonical, hreflang, Open Graph, Twitter, article tags, geo tags, verification codes) and a linked JSON-LD `@graph` (ProfessionalService/Organization with NAP, areas, founder and ACN; WebSite; WebPage type; BreadcrumbList; Service + Offer; BlogPosting + Person (E-E-A-T); FAQPage; HowTo; VideoObject; ItemList; ProfilePage). The CMS content is also rendered as plain semantic HTML inside `#root`, because most AI crawlers (GPTBot, ClaudeBot, PerplexityBot) do not run JavaScript. Missing pages return a real 404, uppercase/trailing-slash URLs 301, CMS redirects 301/302, and a CMS outage returns 503 so Google does not drop pages.
+
+Feeds: `/sitemap.xml` (with images, noindex/expired/canonicalised pages removed), `/robots.txt` (AI bot blocks are editable), `/llms.txt`, `/rss.xml`, and `/<IndexNow key>.txt`.
+
+**Analytics & lead tracking:** GA4, GTM, Google Ads (with enhanced conversions), Meta Pixel, Microsoft Clarity, LinkedIn and TikTok are loaded from Site settings, with optional Google Consent Mode v2 banner. SPA page views, CTA clicks (`data-track`), phone/email/outbound clicks, scroll depth, form starts and `generate_lead` conversions are tracked. First- and last-touch UTMs, click IDs (gclid, fbclid, msclkid…), landing page, referrer, device and visit count are saved with every lead. Leads are stored in Sanity as **private** documents (`leads.<uuid>` — IDs with a dot are never readable without a token, even in a public dataset), auto-classified by channel (Paid search, Organic search, AI assistant, Google Business Profile…), and shown in Studio → Leads with a pipeline status. Optional email (Resend) and webhook (Zapier/Make/CRM) alerts.
+
+### Set up
+
+1. `npm install`
+2. Deploy the Studio: `npm run sanity:deploy` (host name `drivwon` → https://drivwon.sanity.studio). Set `VITE_SANITY_STUDIO_URL` to that URL.
+3. In sanity.io/manage → API → Tokens, create an **Editor** token. Use it once to seed: `SANITY_WRITE_TOKEN=… npm run sanity:seed` (creates **drafts only**; add `--publish` to publish, `--force` to overwrite). Never commit the token.
+4. Create a second Editor token for the website server and save it as `SANITY_LEADS_TOKEN` in Vercel / Replit secrets so leads can be stored.
+5. In Studio, search for `[CHECK]`, fix every item (phone number, case study results, location copy, cover images), then publish.
+6. In Site settings add GA4 / GTM / Ads / Clarity IDs, Search Console and Bing verification codes, social profile URLs and your Google Business Profile URL.
+7. Submit `https://drivwon.com/sitemap.xml` in Google Search Console and Bing Webmaster Tools.
+
+### Test
+
+`npm run test:seo` builds a dry-run dataset and runs every GROQ query offline (groq-js), then checks titles, H1s, robots, canonicals, JSON-LD, status codes, redirects, feeds and that leads never leak. `npm run sanity:validate` validates the schema.
+
+### Deploy
+
+Vercel: `vercel.json` serves static assets first and sends every other route to `api/site.ts` (server-side SEO) and `/api/leads` to `api/leads.ts`. Express (`npm run build && npm run start`) uses the same handlers. Env vars: `APP_URL`, `SANITY_LEADS_TOKEN`, and optionally `RESEND_API_KEY`, `LEAD_NOTIFY_EMAIL`, `LEAD_FROM_EMAIL`, `LEAD_WEBHOOK_URL`.
 
 ## Private workspace setup
 
@@ -48,6 +68,9 @@ Set these values in Replit Secrets or the app host's server environment:
 | `VITE_GOOGLE_PICKER_API_KEY` | Optional public browser key, restricted to the website origin and Google Picker API |
 | `VITE_SANITY_STUDIO_URL` | Hosted Studio origin |
 | `SANITY_WRITE_TOKEN` | Temporary server-side secret used only when running the CMS seed script |
+| `SANITY_LEADS_TOKEN` | Server-side Editor token used to save form leads as private Sanity documents |
+| `RESEND_API_KEY` / `LEAD_NOTIFY_EMAIL` / `LEAD_FROM_EMAIL` | Optional email alert for every new lead |
+| `LEAD_WEBHOOK_URL` | Optional webhook (Zapier, Make, CRM) that receives every lead as JSON |
 
 For optional Drive uploads, configure a Google OAuth app, add the exact callback URL, and enable the Google Drive API and Google Picker API. The app requests `drive.file`, not full-Drive access. After the admin password login, an approved Google account connects Drive and selects the shared company folder in **Documents**; it must already have permission to add files to it. Uploads create project and invoice subfolders there. The database stores file metadata and Drive links, not the uploaded file bytes. There is no local-storage fallback if Drive is unavailable.
 

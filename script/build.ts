@@ -1,6 +1,6 @@
 import { build as esbuild } from "esbuild";
 import { build as viteBuild } from "vite";
-import { rm, readFile } from "fs/promises";
+import { rm, readFile, rename } from "fs/promises";
 
 // server deps to bundle to reduce openat(2) syscalls
 // which helps cold start times
@@ -38,6 +38,8 @@ async function buildAll() {
 
   console.log("building client...");
   await viteBuild();
+  // The HTML shell is rendered per request (SEO tags + crawler HTML), so it must not be served as a static file.
+  await rename("dist/public/index.html", "dist/template.html");
 
   console.log("building server...");
   const pkg = JSON.parse(await readFile("package.json", "utf-8"));
