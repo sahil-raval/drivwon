@@ -5,6 +5,7 @@ import viteConfig from "../vite.config";
 import fs from "fs";
 import path from "path";
 import { nanoid } from "nanoid";
+import { handleSeoRoute } from "./seo/handler";
 
 const viteLogger = createLogger();
 
@@ -49,7 +50,9 @@ export async function setupVite(server: Server, app: Express) {
         `src="/src/main.tsx?v=${nanoid()}"`,
       );
       const page = await vite.transformIndexHtml(url, template);
-      res.status(200).set({ "Content-Type": "text/html" }).end(page);
+      // Same server-side SEO rendering as production, so you can check tags and crawler HTML locally.
+      const result = await handleSeoRoute(url, async () => page);
+      res.status(result.status).set(result.headers).end(result.body);
     } catch (e) {
       vite.ssrFixStacktrace(e as Error);
       next(e);

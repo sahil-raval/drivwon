@@ -1,0 +1,8 @@
+{
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "editor.formatOnSave": false,
+  "files.exclude": { "**/.sanity": true, "dist": false },
+  "search.exclude": { "dist": true, "node_modules": true, "package-lock.json": true },
+  "tailwindCSS.experimental.configFile": "client/src/index.css",
+  "files.associations": { ".env.sample": "dotenv" }
+}

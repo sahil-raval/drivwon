@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import emailjs from '@emailjs/browser';
+import { submitLead } from '@/features/leads/submitLead';
 
 const formSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -57,6 +58,9 @@ export default function Quotation() {
       message: values.details,
       to_email: 'info@drivwon.com', // Your email where quotes will be sent
     };
+
+    // Save the lead with its marketing attribution (Sanity → Leads) and fire conversion events.
+    void submitLead({ formName: 'Quote request', leadType: 'quote', fields: { name: values.name, company: values.company ?? "", email: values.email, service: values.service, budget: values.budget, message: values.details } });
 
     try {
       await emailjs.send(

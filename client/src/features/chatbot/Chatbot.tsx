@@ -40,7 +40,7 @@ export default function Chatbot() {
   }
 
   return (
-    <div className="fixed bottom-5 right-5 z-[70]">
+    <div className="drivwon-chat fixed bottom-24 right-4 z-[70] md:bottom-5 md:right-5">
       {open && <section className="mb-3 flex h-[min(32rem,calc(100vh-7rem))] w-[min(23rem,calc(100vw-2.5rem))] flex-col overflow-hidden rounded-2xl border border-white/10 bg-[#101014] shadow-2xl" aria-label="Drivwon chat assistant">
         <header className="flex items-center justify-between border-b border-white/10 px-4 py-3"><div className="flex items-center gap-3"><span className="rounded-full bg-primary/20 p-2 text-primary"><Bot size={18} /></span><div><p className="font-semibold">Drivwon assistant</p><p className="text-xs text-muted-foreground">Answers from our published FAQs</p></div></div><button className="rounded-full p-2 text-muted-foreground hover:bg-white/10" aria-label="Close chat" onClick={() => setOpen(false)}><X size={18} /></button></header>
         <div className="flex-1 space-y-3 overflow-y-auto p-4" aria-live="polite">

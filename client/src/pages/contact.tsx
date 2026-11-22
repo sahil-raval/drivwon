@@ -12,6 +12,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import emailjs from '@emailjs/browser';
+import { submitLead } from '@/features/leads/submitLead';
 
 const formSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -48,6 +49,9 @@ export default function Contact() {
       message: values.message,
       to_email: 'info@drivwon.com', 
     };
+
+    // Save the lead with its marketing attribution (Sanity → Leads) and fire conversion events.
+    void submitLead({ formName: 'Contact form', leadType: 'enquiry', fields: { name: values.name, email: values.email, message: values.message } });
 
     try {
       await emailjs.send(

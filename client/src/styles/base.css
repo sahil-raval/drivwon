@@ -64,3 +64,14 @@
     }
   }
 }
+
+/* Server-rendered content shown to crawlers and to users for the moment before React loads. */
+.ssr-shell { max-width: 72rem; margin: 0 auto; padding: 6rem 1.5rem 4rem; line-height: 1.65; color: hsl(var(--muted-foreground)); }
+.ssr-shell header { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; margin-bottom: 3rem; }
+.ssr-shell h1 { font-size: clamp(2.25rem, 6vw, 4.5rem); line-height: 1.05; color: hsl(var(--foreground)); margin: 0 0 1.5rem; }
+.ssr-shell h2 { font-size: 1.75rem; color: hsl(var(--foreground)); margin: 2.5rem 0 1rem; }
+.ssr-shell h3 { font-size: 1.15rem; color: hsl(var(--foreground)); margin: 1.25rem 0 .5rem; }
+.ssr-shell img { display: none; }
+.ssr-shell a { color: hsl(var(--primary)); }
+.ssr-shell ul, .ssr-shell ol { padding-left: 1.25rem; }
+[data-hide-chat] .drivwon-chat { display: none; }
