@@ -1,6 +1,6 @@
 /** Vercel function: POST /api/leads — stores website enquiries privately in Sanity. */
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { handleLead } from "../server/leads";
+import { handleLead } from "../server/leads.js";
 
 async function readJson(req: IncomingMessage & { body?: unknown }) {
   if (req.body && typeof req.body === "object") return req.body;

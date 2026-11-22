@@ -9,3 +9,5 @@ vite.config.ts.*
 !.env.example
 !.env.sample
 .sanity
+
+.vercel-test

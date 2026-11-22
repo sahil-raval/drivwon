@@ -1,7 +1,7 @@
-import { DEFAULT_SITE_URL } from "../cms/config";
-import { hasImage, imageDimensions, imageUrl, fileUrl } from "../cms/image";
-import { pathForDoc } from "../cms/routes";
-import { collectFaqs, firstHero, ptToText, sectionsText, truncate, wordCount } from "./text";
+import { DEFAULT_SITE_URL } from "../cms/config.js";
+import { hasImage, imageDimensions, imageUrl, fileUrl } from "../cms/image.js";
+import { pathForDoc } from "../cms/routes.js";
+import { collectFaqs, firstHero, ptToText, sectionsText, truncate, wordCount } from "./text.js";
 
 export type HeadTag = { tag: "meta"; attrs: Record<string, string> } | { tag: "link"; attrs: Record<string, string> };
 export type HeadData = { title: string; description: string; canonical: string; robots: string; tags: HeadTag[]; jsonLd: Record<string, unknown>[]; noIndex: boolean };

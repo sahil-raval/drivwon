@@ -6,7 +6,7 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import fs from "node:fs/promises";
 import path from "node:path";
-import { handleSeoRoute } from "../server/seo/handler";
+import { handleSeoRoute } from "../server/seo/handler.js";
 
 let template: string | null = null;
 async function getTemplate() {

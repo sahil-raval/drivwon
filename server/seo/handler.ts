@@ -1,13 +1,13 @@
 /**
  * Framework-free SEO responses. Used by Express (server/static.ts, server/vite.ts) and by the Vercel function (api/site.ts).
  */
-import { sanityFetch } from "../../shared/cms/config";
-import { LLMS_QUERY, REDIRECT_QUERY, RSS_QUERY, SETTINGS_QUERY, SITEMAP_QUERY, routeQuery } from "../../shared/cms/queries";
-import { isPrivatePath, matchRoute, pathForDoc } from "../../shared/cms/routes";
-import { imageUrl } from "../../shared/cms/image";
-import { buildHead, safeJson, siteUrlOf, type HeadData } from "../../shared/seo/head";
-import { esc, renderCrawlerHtml } from "./crawlerHtml";
-import { builtInPages } from "../../shared/seo/builtins";
+import { sanityFetch } from "../../shared/cms/config.js";
+import { LLMS_QUERY, REDIRECT_QUERY, RSS_QUERY, SETTINGS_QUERY, SITEMAP_QUERY, routeQuery } from "../../shared/cms/queries.js";
+import { isPrivatePath, matchRoute, pathForDoc } from "../../shared/cms/routes.js";
+import { imageUrl } from "../../shared/cms/image.js";
+import { buildHead, safeJson, siteUrlOf, type HeadData } from "../../shared/seo/head.js";
+import { esc, renderCrawlerHtml } from "./crawlerHtml.js";
+import { builtInPages } from "../../shared/seo/builtins.js";
 
 export type SeoResponse = { status: number; headers: Record<string, string>; body: string };
 
