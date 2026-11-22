@@ -41,7 +41,7 @@ export const siteSettings = defineType({
     // Brand
     defineField({ name: "siteName", title: "Brand name", type: "string", group: "brand", initialValue: "Drivwon", validation: (rule) => rule.required() }),
     defineField({ name: "tagline", title: "Tagline", type: "string", group: "brand" }),
-    defineField({ name: "siteUrl", title: "Website URL", type: "url", group: "brand", initialValue: "https://www.drivwon.com.au", description: "Exact live origin, no trailing slash. Used for canonicals, sitemap and schema." }),
+    defineField({ name: "siteUrl", title: "Website URL", type: "url", group: "brand", initialValue: "https://www.drivwon.com", description: "Exact live origin, no trailing slash. Used for canonicals, sitemap and schema." }),
     imageField("logo", "Logo", { group: "brand" }),
     defineField({ name: "logoSquare", title: "Square logo (min 112×112)", type: "image", group: "brand", description: "Used in Organization schema — Google shows it in search and Knowledge Panels." }),
     defineField({ name: "favicon", title: "Favicon (PNG 512×512)", type: "image", group: "brand" }),

@@ -19,7 +19,7 @@ async function getTemplate() {
 
 export default async function handler(req: IncomingMessage, res: ServerResponse) {
   try {
-    const url = new URL(req.url ?? "/", "https://www.drivwon.com.au");
+    const url = new URL(req.url ?? "/", "https://www.drivwon.com");
     // vercel.json rewrites "/(.*)" to "/api/site?__path=/$1"; rebuild the original path + query.
     const original = url.searchParams.get("__path") ?? url.pathname;
     url.searchParams.delete("__path");

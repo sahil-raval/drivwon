@@ -38,7 +38,7 @@ Feeds: `/sitemap.xml` (with images, noindex/expired/canonicalised pages removed)
 4. Create a second Editor token for the website server and save it as `SANITY_LEADS_TOKEN` in Vercel / Replit secrets so leads can be stored.
 5. In Studio, search for `[CHECK]`, fix every item (phone number, case study results, location copy, cover images), then publish.
 6. In Site settings add GA4 / GTM / Ads / Clarity IDs, Search Console and Bing verification codes, social profile URLs and your Google Business Profile URL.
-7. Submit `https://www.drivwon.com.au/sitemap.xml` in Google Search Console and Bing Webmaster Tools.
+7. Submit `https://www.drivwon.com/sitemap.xml` in Google Search Console and Bing Webmaster Tools.
 
 ### Test
 
@@ -62,7 +62,7 @@ Set these values in Replit Secrets or the app host's server environment:
 | `SESSION_SECRET` | Long random session/encryption secret; keep it server-only |
 | `DRIVWON_ADMIN_PASSWORD` | Private workspace password; use a unique password of at least 16 characters |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Optional Google OAuth web client, only for Drive |
-| `GOOGLE_REDIRECT_URI` | Exact optional OAuth callback URL, e.g. `https://www.drivwon.com.au/api/auth/google/callback` |
+| `GOOGLE_REDIRECT_URI` | Exact optional OAuth callback URL, e.g. `https://www.drivwon.com/api/auth/google/callback` |
 | `GOOGLE_ALLOWED_EMAILS` | Comma-separated approved Drive accounts; use the narrowest allowlist |
 | `APP_URL` | Canonical production origin |
 | `VITE_GOOGLE_PICKER_API_KEY` | Optional public browser key, restricted to the website origin and Google Picker API |

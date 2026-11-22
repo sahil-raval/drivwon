@@ -457,7 +457,7 @@ function buildDocs(images: Record<keyof typeof imageFiles, string>): Doc[] {
 
   // Site settings
   add({
-    _id: "siteSettings", _type: "siteSettings", siteName: "Drivwon", tagline: "Web design, SEO & AI automation in Geelong", siteUrl: "https://www.drivwon.com.au",
+    _id: "siteSettings", _type: "siteSettings", siteName: "Drivwon", tagline: "Web design, SEO & AI automation in Geelong", siteUrl: "https://www.drivwon.com",
     logo: { ...img(images.logo, "Drivwon logo") }, logoSquare: img(images.logo, "Drivwon"),
     description: "Drivwon is a digital studio in Geelong, Victoria that builds websites, runs SEO and AI search optimisation, and creates apps and AI automation for small and medium businesses.",
     longDescription: "Drivwon is a Geelong, Victoria (Australia) digital studio founded in August 2026 by AI engineer and full-stack developer Sahil Raval. Services: web design and development (from $1,800 AUD), SEO (from $650 AUD per month), generative engine optimisation for AI search, e-commerce, mobile apps, custom software and AI automation. All work is done in-house. Clients are mainly small and medium businesses in Geelong, the Surf Coast, the Bellarine Peninsula and across Australia.",
