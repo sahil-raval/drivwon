@@ -23,14 +23,14 @@ if (!token) {
 }
 const client = createClient({ projectId: process.env.SANITY_PROJECT_ID || "v6luawxh", dataset: process.env.SANITY_DATASET || "production", apiVersion: "2026-10-12", token, useCdn: false, perspective: "raw" });
 
-/** The 8 service pages we keep (seeded IDs). */
-const KEEP = new Set(["service-seo-geelong", "service-web-design-geelong", "service-ai-search-optimisation", "service-ecommerce", "service-ai-automation", "service-custom-software", "service-app-development", "service-branding"]);
+/** The 11 service pages we keep (seeded IDs). */
+const KEEP = new Set(["service-google-ads", "service-website-care", "service-social-media", "service-seo-geelong", "service-web-design-geelong", "service-ai-search-optimisation", "service-ecommerce", "service-ai-automation", "service-custom-software", "service-app-development", "service-branding"]);
 
 /** Old slug → main page it should redirect to. Unknown slugs fall back to /services. */
 const TARGET: Record<string, string> = {
   "seo": "/services/seo-geelong",
   "search-engine-optimisation": "/services/seo-geelong",
-  "digital-marketing": "/services/seo-geelong",
+  "digital-marketing": "/services/social-media-marketing-geelong",
   "web-development": "/services/web-design-geelong",
   "mobile-apps": "/services/app-development",
   "ui-ux-design": "/services/branding-ui-ux-design",
