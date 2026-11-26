@@ -23,8 +23,8 @@ if (!token) {
 }
 const client = createClient({ projectId: process.env.SANITY_PROJECT_ID || "v6luawxh", dataset: process.env.SANITY_DATASET || "production", apiVersion: "2026-10-12", token, useCdn: false, perspective: "raw" });
 
-/** The 11 service pages we keep (seeded IDs). */
-const KEEP = new Set(["service-google-ads", "service-website-care", "service-social-media", "service-seo-geelong", "service-web-design-geelong", "service-ai-search-optimisation", "service-ecommerce", "service-ai-automation", "service-custom-software", "service-app-development", "service-branding"]);
+/** The 14 service pages we keep (seeded IDs). */
+const KEEP = new Set(["service-ai-agents", "service-ai-consulting", "service-ai-chatbot", "service-google-ads", "service-website-care", "service-social-media", "service-seo-geelong", "service-web-design-geelong", "service-ai-search-optimisation", "service-ecommerce", "service-ai-automation", "service-custom-software", "service-app-development", "service-branding"]);
 
 /** Old slug → main page it should redirect to. Unknown slugs fall back to /services. */
 const TARGET: Record<string, string> = {
