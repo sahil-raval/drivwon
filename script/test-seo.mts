@@ -23,7 +23,7 @@ const { handleSeoRoute } = await import(`${repo}/server/seo/handler.ts`);
 const template = fs.readFileSync(`${repo}/dist/template.html`, "utf8");
 const routes = ["/", "/about", "/services", "/projects", "/contact", "/quotation", "/privacy-policy", "/blog", "/locations", "/thank-you",
   "/services/seo-geelong", "/services/web-design-geelong", "/services/ai-search-optimisation", "/locations/web-design-seo-torquay-surf-coast",
-  "/projects/varni-diamonds", "/blog/website-cost-geelong", "/blog/what-is-generative-engine-optimisation", "/blog/category/seo", "/authors/sahil-raval",
+  "/projects/varni-diamonds", "/blog/website-cost-geelong", "/blog/what-is-generative-engine-optimisation", "/blog/choose-web-designer-seo-agency-geelong", "/blog/seo-vs-google-ads-geelong", "/blog/category/seo", "/authors/sahil-raval",
   "/free-seo-audit-geelong", "/does-not-exist", "/About", "/about/", "/drivwon/der", "/studio"];
 let failures = 0;
 const fail = (msg: string) => { failures++; console.log("  ✗", msg); };

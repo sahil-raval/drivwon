@@ -67,6 +67,22 @@ Do not compete as “another SEO agency”. Defensible angle: **developers and A
 5. Earn local mentions: Geelong Chamber, Deakin alumni, local news/podcasts, sponsoring a local club.
 6. Track a fixed set of AI prompts monthly (e.g. “best web designer in Geelong”, “SEO agency Geelong recommendations”) and GA4 AI referrals.
 
+## Live audit — 26 Nov 2026 (www.drivwon.com.au)
+
+The code is in good shape (server-rendered head, JSON-LD graph, sitemap, robots, llms.txt). The problems are now in the **live CMS content**:
+
+| Problem on live site | Fix |
+| --- | --- |
+| 15 service pages, 7 of them duplicates/legacy (`/services/seo`, `/web-development`, `/mobile-apps`, `/ui-ux-design`, `/system-architecture`, `/data-analytics`, `/digital-marketing`) | `npm run sanity:cleanup-services -- --yes` → deletes them and adds 301s to the main pages |
+| /projects shows 3 unnamed case studies ("Regional distributor", "Services company", "Multi-branch retailer") | If not real work: `npm run sanity:cleanup-services -- --yes --case-studies`. Publish the real ones (Varni Diamonds, Day To Day Deals, Scrub N Clean, MSM) after filling `[CHECK]` |
+| /blog lists 0 posts — seeded posts are still drafts | Fix `[CHECK]` (cover images), then `npm run sanity:publish -- --yes --include-posts` |
+| Location pages still drafts | Add one real local proof point each, then `--include-locations` |
+| SEO page said "monthly content", citations and GEO are in every plan; Local plan has none of them | Seed fixed; edit the live SEO Geelong page in Studio the same way |
+| Ballarat and Melbourne in service areas dilute the Geelong-region signal | Seed fixed; edit Site settings → Areas served and the home/locations sections in Studio |
+| Email `info@drivwon.com` on a `drivwon.com.au` site | Owner decision. If `info@drivwon.com.au` works, switch everywhere (site, GBP, directories) at once — never mix |
+
+New draft posts in the seed (answer-first, for AEO): `/blog/choose-web-designer-seo-agency-geelong`, `/blog/seo-vs-google-ads-geelong`. Run `npm run sanity:seed` (drafts only, never overwrites edits) to add them.
+
 ## Verification after deploy
 
 - `curl -A GPTBot https://www.drivwon.com.au/services/seo-geelong` → content and JSON-LD present

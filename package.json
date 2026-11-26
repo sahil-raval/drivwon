@@ -21,7 +21,8 @@
     "setup": "node -e \"require('fs').existsSync('.env')||require('fs').copyFileSync('.env.sample','.env')\" && npm install",
     "test:vercel": "node script/test-vercel.mjs",
     "test": "npm run check && npm run test:vercel && npm run test:seo",
-    "sanity:publish": "tsx script/publish-seed.ts"
+    "sanity:publish": "tsx script/publish-seed.ts",
+    "sanity:cleanup-services": "tsx script/cleanup-legacy-services.ts"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
