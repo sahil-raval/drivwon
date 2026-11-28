@@ -303,6 +303,7 @@ function renderSection(section: Section, index: number, context: { firstHeroKey?
     case "servicesSection":
       return <SectionShell settings={section.settings}><SectionIntro section={section} /><ServiceCards list={section.serviceList ?? []} columns={section.columns} />{section.link && <div className="mt-10"><CmsLink link={section.link} /></div>}</SectionShell>;
     case "projectsSection":
+      if (!(section.projectList ?? []).length) return null; // no empty "Recent projects" block
       return <SectionShell settings={section.settings}><SectionIntro section={section} /><ProjectCards list={(section.projectList ?? []).slice(0, section.limit ?? 6)} />{section.link && <div className="mt-10"><CmsLink link={section.link} /></div>}</SectionShell>;
     case "caseHighlightSection": {
       const doc = section.caseDoc;
