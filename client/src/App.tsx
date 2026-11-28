@@ -7,9 +7,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import SmoothScroll from "@/components/ui/SmoothScroll";
 import CustomCursor from "@/components/ui/CustomCursor";
 import PageTransition from "@/components/ui/PageTransition";
-import { useAudio } from "@/lib/audio";
-import { Volume2, VolumeX } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import ScrollToTop from "@/components/ui/ScrollToTop";
 import Analytics from "@/features/analytics/Analytics";
 
@@ -76,23 +73,6 @@ function Router() {
   );
 }
 
-function SoundController() {
-  const [location] = useLocation();
-  const { toggleMute, isMuted } = useAudio();
-  if (location === "/drivwon/der") return null;
-  return (
-    <Button
-      variant="outline"
-      size="icon"
-      aria-label={isMuted ? "Turn sound on" : "Turn sound off"}
-      className="fixed bottom-24 left-4 z-50 h-11 w-11 rounded-full border-white/10 bg-black/50 text-white backdrop-blur-md hover:bg-white/10 md:bottom-6 md:left-6"
-      onClick={toggleMute}
-    >
-      {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-    </Button>
-  );
-}
-
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -101,7 +81,6 @@ function App() {
           <CustomCursor />
           <Toaster />
           <Analytics />
-          <SoundController />
           <Router />
         </SmoothScroll>
       </TooltipProvider>
