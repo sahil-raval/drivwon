@@ -14,3 +14,11 @@
     margin-inline: auto;
   }
 }
+
+/* Accessibility: #6d28d9 text on the near-black background had a 2.6–2.8 contrast ratio (WCAG needs 4.5).
+   Text uses a lighter shade of the same brand violet; buttons keep the original colour. */
+:root .text-primary,
+:root .hover\:text-primary:hover,
+:root .group:hover .group-hover\:text-primary {
+  color: hsl(263 90% 78%);
+}

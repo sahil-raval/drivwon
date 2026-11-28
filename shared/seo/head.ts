@@ -169,8 +169,8 @@ export function organizationNode(settings: any) {
     slogan: settings?.tagline,
     email: settings?.email,
     telephone: settings?.phoneE164 || settings?.phone,
-    logo: hasImage(logo) ? clean({ "@type": "ImageObject", "@id": `${base}/#logo`, url: imageUrl(logo, 512), width: 512, height: (() => { const size = imageDimensions(logo); return size ? Math.round((size.height / size.width) * 512) : undefined; })() }) : `${base}/logo.png`,
-    image: hasImage(settings?.defaultOgImage) ? imageUrl(settings.defaultOgImage, 1200) : undefined,
+    logo: hasImage(logo) ? clean({ "@type": "ImageObject", "@id": `${base}/#logo`, url: imageUrl(logo, 512), width: 512, height: (() => { const size = imageDimensions(logo); return size ? Math.round((size.height / size.width) * 512) : undefined; })() }) : `${base}/logo-square.png`,
+    image: hasImage(settings?.defaultOgImage) ? imageUrl(settings.defaultOgImage, 1200) : `${base}/og-default.jpg`,
     address: clean({
       "@type": "PostalAddress",
       streetAddress: settings?.showAddress ? settings?.streetAddress : undefined,
@@ -213,7 +213,7 @@ export function buildHead({ doc, settings, path, fallback, list }: HeadInput): H
   const noIndex = Boolean(seo.noIndex || fallback?.noIndex || expired);
   const robots = robotsFor(seo, noIndex);
   const image = docImage(doc, settings);
-  const imageSrc = image ? imageUrl(image, 1200, 630) : `${base}/logo.png`;
+  const imageSrc = image ? imageUrl(image, 1200, 630) : `${base}/og-default.jpg`;
   const imageAlt = (image as any)?.alt || title;
   const isArticle = doc?._type === "post";
   const ogType = isArticle ? "article" : doc?._type === "author" ? "profile" : "website";
@@ -235,8 +235,8 @@ export function buildHead({ doc, settings, path, fallback, list }: HeadInput): H
   meta("property", "og:url", canonical);
   meta("property", "og:image", imageSrc);
   meta("property", "og:image:secure_url", imageSrc);
-  meta("property", "og:image:width", image ? 1200 : undefined);
-  meta("property", "og:image:height", image ? 630 : undefined);
+  meta("property", "og:image:width", 1200);
+  meta("property", "og:image:height", 630);
   meta("property", "og:image:alt", imageAlt);
   meta("name", "twitter:card", seo.twitterCard || "summary_large_image");
   meta("name", "twitter:title", seo.ogTitle || title);

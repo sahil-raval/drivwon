@@ -111,7 +111,9 @@ export function setConsent(value: "granted" | "denied") {
 export function pageview(path: string, title = document.title) {
   if (!settings) return;
   const params = { page_path: path, page_location: window.location.href, page_title: title };
-  if (settings.ga4Id) window.gtag?.("event", "page_view", { ...params, send_to: settings.ga4Id });
+  // When GTM is also installed, its Google tag already sends page_view (including SPA route
+  // changes via GA4 enhanced measurement). Sending another here doubled every page view.
+  if (settings.ga4Id && !settings.gtmId) window.gtag?.("event", "page_view", { ...params, send_to: settings.ga4Id });
   window.dataLayer?.push({ event: "virtual_page_view", ...params });
   window.fbq?.("track", "PageView");
   window.ttq?.page();

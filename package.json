@@ -21,7 +21,8 @@
     "setup": "node -e \"require('fs').existsSync('.env')||require('fs').copyFileSync('.env.sample','.env')\" && npm install",
     "test:vercel": "node script/test-vercel.mjs",
     "test": "npm run check && npm run test:vercel && npm run test:seo",
-    "sanity:publish": "tsx script/publish-seed.ts"
+    "sanity:publish": "tsx script/publish-seed.ts",
+    "sanity:cleanup-services": "tsx script/cleanup-legacy-services.ts"
   },
   "dependencies": {
     "@emailjs/browser": "^4.4.1",
@@ -58,7 +59,6 @@
     "@sanity/client": "^8.9.0",
     "@sanity/image-url": "^2.2.0",
     "@tanstack/react-query": "^5.60.5",
-    "@types/howler": "^2.2.12",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -73,7 +73,6 @@
     "express-session": "^1.18.1",
     "framer-motion": "^12.23.24",
     "google-auth-library": "^11.2.0",
-    "howler": "^2.2.4",
     "input-otp": "^1.4.2",
     "lenis": "^1.3.16",
     "lucide-react": "^0.545.0",

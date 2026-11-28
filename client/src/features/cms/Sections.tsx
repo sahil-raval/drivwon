@@ -288,14 +288,14 @@ function renderSection(section: Section, index: number, context: { firstHeroKey?
           <SectionIntro section={section} />
           <ol className="grid gap-6 md:grid-cols-2">
             {(section.steps ?? []).map((step: any, stepIndex: number) => (
-              <Reveal key={step._key} enabled={animate} delay={stepIndex * 0.05}>
-                <li className="h-full list-none rounded-2xl border border-white/10 bg-white/[.03] p-7">
+              <li key={step._key} className="list-none h-full"><Reveal enabled={animate} delay={stepIndex * 0.05} className="h-full  rounded-2xl border border-white/10 bg-white/[.03] p-7">
+                
                   <p className="font-display text-sm font-bold text-primary">{String(stepIndex + 1).padStart(2, "0")}{step.duration ? ` · ${step.duration}` : ""}</p>
                   <h3 className="mt-2 font-display text-2xl font-bold text-white">{step.title}</h3>
                   {step.body && <p className="mt-3 leading-relaxed text-muted-foreground">{step.body}</p>}
                   {step.bullets?.length > 0 && <ul className="mt-4 space-y-1.5 text-sm text-white/80">{step.bullets.map((bullet: string) => <li key={bullet} className="flex gap-2"><Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden />{bullet}</li>)}</ul>}
-                </li>
-              </Reveal>
+                
+              </Reveal></li>
             ))}
           </ol>
         </SectionShell>
